@@ -11,14 +11,13 @@ type Cacher struct {
 	store *sync.Map
 }
 
-func (c *Cacher) init() {
-	if c.store == nil {
-		c.store = &sync.Map{}
+func NewCacher() *Cacher {
+	return &Cacher{
+		store: &sync.Map{},
 	}
 }
 
 func (c *Cacher) Get(ctx context.Context, key string, q *caches.Query[any]) (*caches.Query[any], error) {
-	c.init()
 	val, ok := c.store.Load(key)
 	if !ok {
 		return nil, nil
@@ -32,7 +31,6 @@ func (c *Cacher) Get(ctx context.Context, key string, q *caches.Query[any]) (*ca
 }
 
 func (c *Cacher) Store(ctx context.Context, key string, val *caches.Query[any]) error {
-	c.init()
 	res, err := val.Marshal()
 	if err != nil {
 		return err
