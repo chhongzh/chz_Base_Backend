@@ -1,0 +1,20 @@
+Database:
+  # 数据库 Dsn 信息
+  Dsn: "chz_Base:chz_Base@tcp(127.0.0.1:3306)/chz_Base?charset=utf8mb4&parseTime=True&loc=Local"
+
+Api:
+  # 监听地址
+  Host: "0.0.0.0:6778"
+
+  Prefix: "/api"
+
+  # 跨域信息
+  CorsOrigins:
+    - "http://localhost:3000"
+
+  MaxUserCount: 5
+
+  MaxSignSessionCount: 32
+  MaxSignSessionWaitingCount: 3
+
+IsProd: false
