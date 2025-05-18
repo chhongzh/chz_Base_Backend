@@ -5,15 +5,21 @@ import (
 	"sync"
 
 	"github.com/go-gorm/caches/v4"
+	"go.uber.org/zap"
 )
 
 type Cacher struct {
-	store *sync.Map
+	store  *sync.Map
+	logger *zap.Logger
+
+	totalHitCount   int
+	totalStoreCount int
 }
 
-func NewCacher() *Cacher {
+func NewCacher(logger *zap.Logger) *Cacher {
 	return &Cacher{
-		store: &sync.Map{},
+		store:  &sync.Map{},
+		logger: logger,
 	}
 }
 
@@ -27,6 +33,8 @@ func (c *Cacher) Get(ctx context.Context, key string, q *caches.Query[any]) (*ca
 		return nil, err
 	}
 
+	c.totalHitCount++
+
 	return q, nil
 }
 
@@ -36,11 +44,30 @@ func (c *Cacher) Store(ctx context.Context, key string, val *caches.Query[any]) 
 		return err
 	}
 
+	c.totalStoreCount++
+
 	c.store.Store(key, res)
 	return nil
 }
 
 func (c *Cacher) Invalidate(ctx context.Context) error {
-	c.store = &sync.Map{}
+	c.logger.Info("Cache Invalidated", zap.Int("Cleanup Count", c.len()))
+
+	c.store.Clear()
 	return nil
+}
+
+func (c *Cacher) len() int {
+	length := 0
+
+	c.store.Range(func(key, value any) bool {
+		length++
+		return true
+	})
+
+	return length
+}
+
+func (c *Cacher) GetCacheInfo() (totalHit int, totalStore int) {
+	return c.totalHitCount, c.totalStoreCount
 }
