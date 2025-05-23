@@ -1,7 +1,13 @@
 Database:
   # 数据库 Dsn 信息
-  Dsn: "chz_Base:chz_Base@tcp(127.0.0.1:3306)/chz_Base?charset=utf8mb4&parseTime=True&loc=Local"
+  # Dsn: "chz_Base:chz_Base@tcp(127.0.0.1:3306)/chz_Base?charset=utf8mb4&parseTime=True&loc=Local"
+  Dsn: "chz_Base.db3"
 
+  # 是否使用Sqlite
+  # 用于测试环境, 方便修改
+  UsingSqlite: true
+
+# Api 配置相关
 Api:
   # 监听地址
   Host: "0.0.0.0:6778"

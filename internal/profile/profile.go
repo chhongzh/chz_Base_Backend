@@ -2,7 +2,8 @@ package profile
 
 type Profile struct {
 	Database struct {
-		Dsn string
+		Dsn         string
+		UsingSqlite bool
 	}
 	Api struct {
 		Host   string
@@ -14,6 +15,9 @@ type Profile struct {
 
 		MaxSignSessionCount        int
 		MaxSignSessionWaitingCount int
+	}
+	Sdk struct {
+		Host string
 	}
 	IsProd bool
 }

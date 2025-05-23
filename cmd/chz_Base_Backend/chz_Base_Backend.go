@@ -5,6 +5,7 @@ import (
 	"github.com/chhongzh/chz_Base_Backend/internal/handler"
 	"github.com/chhongzh/chz_Base_Backend/internal/profile"
 	"github.com/gin-gonic/gin"
+	"github.com/glebarez/sqlite"
 	"github.com/go-gorm/caches/v4"
 	"github.com/spf13/viper"
 	prettyconsole "github.com/thessem/zap-prettyconsole"
@@ -80,7 +81,7 @@ func initDb(cacher *cacher.Cacher) (*gorm.DB, error) {
 		Easer:  true,
 	}}
 
-	db, err := gorm.Open(mysql.Open(prof.Database.Dsn), &gorm.Config{})
+	db, err := gorm.Open(initDbDialector(prof.Database.Dsn, prof.Database.UsingSqlite), &gorm.Config{})
 	if err != nil {
 		return nil, err
 	}
@@ -95,4 +96,15 @@ func initDb(cacher *cacher.Cacher) (*gorm.DB, error) {
 
 func initGin() (*gin.Engine, error) {
 	return gin.New(), nil
+}
+
+func initDbDialector(dsn string, usingSqlite bool) gorm.Dialector {
+	var dialFactory gorm.Dialector
+	if usingSqlite {
+		dialFactory = sqlite.Open(dsn)
+	} else {
+		dialFactory = mysql.Open(dsn)
+	}
+
+	return dialFactory
 }
