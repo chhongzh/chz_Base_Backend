@@ -6,7 +6,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func (s *Service) ApplicationIDAndUserIDFromAccessToken(token string) (string, string, error) {
+func (s *Service) ApplicationIDAndUserIDFromAccessToken(token string) (applicationID string, userID string, err error) {
 	claims, err := jwt.ParseWithClaims(token, &model.AccessToken{}, func(t *jwt.Token) (interface{}, error) {
 		return s.secret, nil
 	})
