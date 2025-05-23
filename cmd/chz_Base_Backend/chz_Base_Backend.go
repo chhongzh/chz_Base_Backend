@@ -56,7 +56,7 @@ func main() {
 	handler := handler.New(db, ginEngine, logger, commit, prof.Api.Prefix, cacher, prof.Api.MaxUserCount, prof.Api.CorsOrigins, prof.Api.MaxSignSessionCount, prof.Api.MaxSignSessionWaitingCount)
 
 	// 运行
-	err = handler.Run(prof.Api.Host)
+	err = handler.Run(prof.Api.Host, prof.Sdk.Host)
 	if err != nil {
 		logger.Fatal("run error", zap.Error(err))
 	}

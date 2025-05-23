@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package pb;
+option go_package = "github.com/chhongzh/chz_Base_Backend/pkg/pb";
+
+import "request.proto";
+import "response.proto";
+
+// Base SDK Service
+service BaseSDKService{
+    // 检查是否有权限
+    rpc HasPermission(HasPermissionRequest) returns (HasPermissionResponse) {}
+}
+

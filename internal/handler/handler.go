@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/chhongzh/chz_Base_Backend/internal/cacher"
+	"github.com/chhongzh/chz_Base_Backend/internal/sdk"
 	"github.com/chhongzh/chz_Base_Backend/internal/service/action"
 	"github.com/chhongzh/chz_Base_Backend/internal/service/announcement"
 	"github.com/chhongzh/chz_Base_Backend/internal/service/application"
@@ -35,6 +36,9 @@ type Handler struct {
 	announcementService *announcement.Service
 	signService         *sign.Service
 
+	// SdkServer
+	sdkServer *sdk.SdkServer
+
 	commit       string
 	startAt      time.Time
 	maxUserCount int64
@@ -44,6 +48,14 @@ type Handler struct {
 func New(db *gorm.DB, gin *gin.Engine, logger *zap.Logger, commit string, prefix string, cacher *cacher.Cacher, maxUserCount int64, corsOrigins []string, maxSignSessionCount int, maxSignSessionWaitingCount int) *Handler {
 	secret, _ := utils.RandomBytes(32)
 
+	userService := user.New(db, logger)
+	securityService := security.New(logger, db, secret)
+	applicationService := application.New(db, logger)
+	actionService := action.New(logger, db)
+	permissionService := permission.New(db, logger)
+	announcementService := announcement.NewService(logger, db)
+	signService := sign.New(logger, maxSignSessionCount, maxSignSessionWaitingCount)
+
 	h := &Handler{
 		db:         db,
 		gin:        gin,
@@ -51,13 +63,15 @@ func New(db *gorm.DB, gin *gin.Engine, logger *zap.Logger, commit string, prefix
 		cacher:     cacher,
 		wsUpgrader: &websocket.Upgrader{CheckOrigin: func(r *http.Request) bool { return true }},
 
-		userService:         user.New(db, logger),
-		securityService:     security.New(logger, db, secret),
-		applicationService:  application.New(db, logger),
-		actionService:       action.New(logger, db),
-		permissionService:   permission.New(db, logger),
-		announcementService: announcement.NewService(logger, db),
-		signService:         sign.New(logger, maxSignSessionCount, maxSignSessionWaitingCount),
+		userService:         userService,
+		securityService:     securityService,
+		applicationService:  applicationService,
+		actionService:       actionService,
+		permissionService:   permissionService,
+		announcementService: announcementService,
+		signService:         signService,
+
+		sdkServer: sdk.NewSdkServer(logger, userService, securityService, permissionService),
 
 		commit:       commit,
 		startAt:      time.Now(),

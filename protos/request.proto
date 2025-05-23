@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package pb;
+option go_package = "github.com/chhongzh/chz_Base_Backend/pkg/pb";
+
+message HasPermissionRequest {
+    string accessToken = 1;
+    string permissionKey = 2;
+}
+

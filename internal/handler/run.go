@@ -2,7 +2,7 @@ package handler
 
 import "github.com/chhongzh/chz_Base_Backend/internal/model"
 
-func (h *Handler) Run(host string) error {
+func (h *Handler) Run(apiHost string, sdkServerHost string) error {
 	// Migrate
 	h.db.AutoMigrate(
 		&model.User{},
@@ -16,7 +16,10 @@ func (h *Handler) Run(host string) error {
 	go h.actionService.Loop()
 	go h.signService.Loop()
 
+	// 启动 SdkServer
+	go h.sdkServer.Run(sdkServerHost)
+
 	h.beforeRun()
 
-	return h.gin.Run(host)
+	return h.gin.Run(apiHost)
 }

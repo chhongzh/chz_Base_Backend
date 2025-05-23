@@ -17,4 +17,9 @@ Api:
   MaxSignSessionCount: 32
   MaxSignSessionWaitingCount: 3
 
+# Sdk 配置相关
+Sdk:
+  # Sdk Host, 使用 TCP
+  Host: "0.0.0.0:6779"
+
 IsProd: false
