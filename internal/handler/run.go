@@ -1,6 +1,11 @@
 package handler
 
-import "github.com/chhongzh/chz_Base_Backend/internal/model"
+import (
+	"net"
+
+	"github.com/chhongzh/chz_Base_Backend/internal/model"
+	"github.com/chhongzh/chz_Base_Backend/internal/utils"
+)
 
 func (h *Handler) Run(apiHost string, sdkServerHost string) error {
 	// Migrate
@@ -21,5 +26,12 @@ func (h *Handler) Run(apiHost string, sdkServerHost string) error {
 
 	h.beforeRun()
 
-	return h.gin.Run(apiHost)
+	// 创建代理 Listener
+	listener, err := net.Listen("tcp", apiHost)
+	if err != nil {
+		return err
+	}
+	listener = utils.ProxyListener(listener, h.logger.Named("Gin Listener"))
+
+	return h.gin.RunListener(listener)
 }
