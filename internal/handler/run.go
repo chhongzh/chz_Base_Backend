@@ -15,6 +15,8 @@ func (h *Handler) Run(apiHost string, sdkServerHost string) error {
 		&model.Application{},
 		&model.Announcement{},
 		&model.Permission{},
+		&model.NameTag{},
+		&model.NameTagOwned{},
 	)
 
 	// 启动各个服务
