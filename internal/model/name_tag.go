@@ -11,7 +11,8 @@ type NameTag struct {
 
 	NameTagID string
 
-	Tag   string `validate:"min=1,max=32"`
+	Tag   string
+	Desc  string
 	Color string `validate:"hexcolor"`
 }
 
