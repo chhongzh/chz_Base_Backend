@@ -3,7 +3,7 @@ package handler
 import (
 	"time"
 
-	"github.com/chhongzh/chz_Base_Backend/internal/service/action"
+	"github.com/chhongzh/chz_Base_Backend/pkg/shortcuts"
 )
 
 func (h *Handler) beforeRun() {
@@ -21,7 +21,7 @@ func (h *Handler) beforeRun() {
 
 	// 发送启动 Action
 	h.actionService.Commit("ROOT", "[Core] 服务启动",
-		action.NewMetaChain().
+		shortcuts.NewMetaChain().
 			Add("Start At", time.Now()).
 			Add("Commit", h.commit),
 	)

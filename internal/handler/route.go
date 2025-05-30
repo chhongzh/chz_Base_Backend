@@ -19,6 +19,12 @@ func (h *Handler) setupRoutes(prefix string) {
 			applicationGroup.POST("/create", h.applicationCreate)
 			applicationGroup.POST("/delete", h.applicationDelete)
 			applicationGroup.POST("/list", h.applicationList)
+
+			forApplicationGroup := applicationGroup.Group("/:ApplicationID")
+			{
+				forApplicationGroup.POST("/public_info",h.applicationPublicInfo)
+				forApplicationGroup.POST("/delete")
+			}
 		}
 
 		announcementGroup := apiGroup.Group("/announcement")

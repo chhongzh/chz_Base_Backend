@@ -6,3 +6,15 @@ option go_package = "github.com/chhongzh/chz_Base_Backend/pkg/pb";
 message HasPermissionResponse {
     bool hasPermission = 1;
 }
+
+message OpenOAuthResponse {
+    string signSessionID = 1;
+}
+
+message VerifyApplicationSecretResponse {
+    bool isValid = 1;
+}
+
+message CommitActionResponse {
+    bool isOk = 1;
+}

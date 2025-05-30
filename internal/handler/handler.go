@@ -71,7 +71,7 @@ func New(db *gorm.DB, gin *gin.Engine, logger *zap.Logger, commit string, prefix
 		announcementService: announcementService,
 		signService:         signService,
 
-		sdkServer: sdk.NewSdkServer(logger, userService, securityService, permissionService),
+		sdkServer: sdk.NewSdkServer(logger, userService, securityService, permissionService, applicationService, signService),
 
 		commit:       commit,
 		startAt:      time.Now(),

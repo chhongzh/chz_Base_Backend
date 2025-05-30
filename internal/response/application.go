@@ -10,3 +10,8 @@ type ApplicationInfo struct {
 type ApplicationCreate struct {
 	ApplicationID string
 }
+
+type ApplicationPublicInfo struct {
+	Name string
+	Desc string
+}

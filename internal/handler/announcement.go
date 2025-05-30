@@ -5,7 +5,7 @@ import (
 	"github.com/chhongzh/chz_Base_Backend/internal/problem"
 	"github.com/chhongzh/chz_Base_Backend/internal/request"
 	"github.com/chhongzh/chz_Base_Backend/internal/response"
-	"github.com/chhongzh/chz_Base_Backend/internal/service/action"
+	"github.com/chhongzh/chz_Base_Backend/pkg/shortcuts"
 	"github.com/gin-gonic/gin"
 )
 
@@ -19,20 +19,20 @@ func (h *Handler) announcementList(c *gin.Context) {
 	// 加载用户
 	user, err := h.userFromAuthToken(req.AuthToken)
 	if err != nil {
-		response.BuildResponseWithError(c, err)
+		shortcuts.BuildResponseWithError(c, err)
 		return
 	}
 
 	// 检查是否有 Announcement 权限
 	if !h.permissionService.HasPermission(user.UserID, "ROOT", constants.PermissionAnnouncement) {
-		response.BuildResponseWithError(c, problem.ErrNoPermission)
+		shortcuts.BuildResponseWithError(c, problem.ErrNoPermission)
 		return
 	}
 
 	// 获取 Announcement List
 	announcements, err := h.announcementService.ListAnnouncements(req.ApplicationID, req.Page)
 	if err != nil {
-		response.BuildResponseWithError(c, err)
+		shortcuts.BuildResponseWithError(c, err)
 		return
 	}
 
@@ -47,7 +47,7 @@ func (h *Handler) announcementList(c *gin.Context) {
 		})
 	}
 
-	response.BuildResponse(c, response.AnnouncementList{
+	shortcuts.BuildResponse(c, response.AnnouncementList{
 		AnnouncementList: announcementList,
 	})
 }
@@ -62,25 +62,25 @@ func (h *Handler) announcementAnnounce(c *gin.Context) {
 	// 加载用户
 	user, err := h.userFromAuthToken(req.AuthToken)
 	if err != nil {
-		response.BuildResponseWithError(c, err)
+		shortcuts.BuildResponseWithError(c, err)
 		return
 	}
 
 	// 检查是否有 Announcement 权限
 	if !h.permissionService.HasPermission(user.UserID, "ROOT", constants.PermissionAnnouncement) {
-		response.BuildResponseWithError(c, problem.ErrNoPermission)
+		shortcuts.BuildResponseWithError(c, problem.ErrNoPermission)
 		return
 	}
 
 	// 发布公告
 	err = h.announcementService.Anounce(req.ApplicationID, req.Title, req.Content, user.UserID)
 	if err != nil {
-		response.BuildResponseWithError(c, err)
+		shortcuts.BuildResponseWithError(c, err)
 		return
 	}
 
 	// Action 记录
-	h.actionService.Commit("ROOT", "[公告] 发布", action.NewMetaChain().
+	h.actionService.Commit("ROOT", "[公告] 发布", shortcuts.NewMetaChain().
 		WithClientInfo(c).
 		Add("User ID", user.UserID).
 		Add("Application ID", req.ApplicationID),
@@ -96,11 +96,11 @@ func (h *Handler) announcementLast(c *gin.Context) {
 
 	announcement, err := h.announcementService.LastAnnouncement(req.ApplicationID)
 	if err != nil {
-		response.BuildResponseWithError(c, err)
+		shortcuts.BuildResponseWithError(c, err)
 		return
 	}
 
-	response.BuildResponse(c, response.AnnouncementInfo{
+	shortcuts.BuildResponse(c, response.AnnouncementInfo{
 		AnnouncementID: announcement.AnnouncementID,
 		Title:          announcement.Title,
 		Content:        announcement.Content,
@@ -119,20 +119,20 @@ func (h *Handler) announcementDelete(c *gin.Context) {
 	// 加载用户
 	user, err := h.userFromAuthToken(req.AuthToken)
 	if err != nil {
-		response.BuildResponseWithError(c, err)
+		shortcuts.BuildResponseWithError(c, err)
 		return
 	}
 
 	// 检查是否有 Announcement 权限
 	if !h.permissionService.HasPermission(user.UserID, "ROOT", constants.PermissionAnnouncement) {
-		response.BuildResponseWithError(c, problem.ErrNoPermission)
+		shortcuts.BuildResponseWithError(c, problem.ErrNoPermission)
 		return
 	}
 
 	// 删除公告
 	err = h.announcementService.Delete(req.AnnouncementID)
 	if err != nil {
-		response.BuildResponseWithError(c, err)
+		shortcuts.BuildResponseWithError(c, err)
 		return
 	}
 }

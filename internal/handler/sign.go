@@ -4,7 +4,7 @@ import (
 	"github.com/chhongzh/chz_Base_Backend/internal/problem"
 	"github.com/chhongzh/chz_Base_Backend/internal/request"
 	"github.com/chhongzh/chz_Base_Backend/internal/response"
-	"github.com/chhongzh/chz_Base_Backend/internal/service/action"
+	"github.com/chhongzh/chz_Base_Backend/pkg/shortcuts"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -19,11 +19,11 @@ func (h *Handler) signCreate(c *gin.Context) {
 	// 调用 service 创建
 	signSessionID, err := h.signService.CreateLoginForApplicationID(req.ApplicationID)
 	if err != nil {
-		response.BuildResponseWithError(c, err)
+		shortcuts.BuildResponseWithError(c, err)
 		return
 	}
 
-	response.BuildResponse(c, response.SignCreate{
+	shortcuts.BuildResponse(c, response.SignCreate{
 		SignSessionID: signSessionID,
 	})
 }
@@ -41,18 +41,18 @@ func (h *Handler) signComplete(c *gin.Context) {
 	// 加载用户
 	user, err := h.userFromAuthToken(req.AuthToken)
 	if err != nil {
-		response.BuildResponseWithError(c, err)
+		shortcuts.BuildResponseWithError(c, err)
 		return
 	}
 	if user.Banned {
-		response.BuildResponseWithError(c, problem.ErrUserHasBeenBanned)
+		shortcuts.BuildResponseWithError(c, problem.ErrUserHasBeenBanned)
 		return
 	}
 
 	// 加载 ApplicationID
 	signSession, err := h.signService.GetSignSession(signSessionID)
 	if err != nil {
-		response.BuildResponseWithError(c, err)
+		shortcuts.BuildResponseWithError(c, err)
 		return
 	}
 
@@ -61,19 +61,19 @@ func (h *Handler) signComplete(c *gin.Context) {
 	// 签发 AccessToken
 	accessToken, err := h.securityService.ApplicationIDAndUserIDToAccessToken(signSession.ApplicationID, user.UserID)
 	if err != nil {
-		response.BuildResponseWithError(c, err)
+		shortcuts.BuildResponseWithError(c, err)
 		return
 	}
 
 	// 调用 service 完成
 	err = h.signService.CompleteSignSession(signSession.SignSessionID, accessToken, nil)
 	if err != nil {
-		response.BuildResponseWithError(c, err)
+		shortcuts.BuildResponseWithError(c, err)
 		return
 	}
 
 	// Action 记录
-	h.actionService.Commit("ROOT", "[授权登录] Oauth 授权登录完成", action.NewMetaChain().
+	h.actionService.Commit("ROOT", "[授权登录] Oauth 授权登录完成", shortcuts.NewMetaChain().
 		Add("ApplicationID", signSession.ApplicationID).
 		Add("User ID", user.UserID).
 		WithClientInfo(c),
@@ -88,12 +88,12 @@ func (h *Handler) signWait(c *gin.Context) {
 
 	accessToken, err := h.signService.WaitForSignSession(signSessionID)
 	if err != nil {
-		response.BuildResponseWithError(c, err)
+		shortcuts.BuildResponseWithError(c, err)
 		return
 	}
 
 	// 调用 service 等待
-	response.BuildResponse(c, response.SignWait{AccessToken: accessToken})
+	shortcuts.BuildResponse(c, response.SignWait{AccessToken: accessToken})
 }
 
 func (h *Handler) signInfo(c *gin.Context) {
@@ -103,19 +103,19 @@ func (h *Handler) signInfo(c *gin.Context) {
 	// 获取Sign实例
 	signSession, err := h.signService.GetSignSession(signSessionID)
 	if err != nil {
-		response.BuildResponseWithError(c, err)
+		shortcuts.BuildResponseWithError(c, err)
 		return
 	}
 
 	// 获取 Appliction 实例
 	application, err := h.applicationService.GetApplicationByApplicationID(signSession.ApplicationID)
 	if err != nil {
-		response.BuildResponseWithError(c, err)
+		shortcuts.BuildResponseWithError(c, err)
 		return
 	}
 
 	// 返回信息
-	response.BuildResponse(c, response.SignInfo{
+	shortcuts.BuildResponse(c, response.SignInfo{
 		ApplicationName: application.Name,
 		ApplicationDesc: application.Desc,
 	})

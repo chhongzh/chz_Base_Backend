@@ -4,7 +4,23 @@ package pb;
 option go_package = "github.com/chhongzh/chz_Base_Backend/pkg/pb";
 
 message HasPermissionRequest {
-    string accessToken = 1;
-    string permissionKey = 2;
+    string applicationSecret = 1;
+    string accessToken = 2;
+    string permissionKey = 3;
 }
 
+
+message OpenOAuthRequest {
+    string applicationSecret = 1;
+}
+
+message VerifyApplicationSecretRequest {
+    string applicationSecret = 1;
+}
+
+message CommitActionRequest {
+    string applicationSecret = 1;
+
+    string message = 2;
+    bytes marshaledMeta = 3;
+}

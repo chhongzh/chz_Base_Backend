@@ -1,5 +1,5 @@
 package sdk
 
-type RequestAction struct {
+type CommitActionRequest struct {
 	
 }

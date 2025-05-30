@@ -10,5 +10,7 @@ import "response.proto";
 service BaseSDKService{
     // 检查是否有权限
     rpc HasPermission(HasPermissionRequest) returns (HasPermissionResponse) {}
+    rpc OpenOAuth(OpenOAuthRequest) returns (OpenOAuthResponse) {}
+    rpc VerifyApplicationSecret(VerifyApplicationSecretRequest) returns (VerifyApplicationSecretResponse) {}
 }
 

@@ -4,7 +4,7 @@ import (
 	"github.com/chhongzh/chz_Base_Backend/internal/problem"
 	"github.com/chhongzh/chz_Base_Backend/internal/request"
 	"github.com/chhongzh/chz_Base_Backend/internal/response"
-	"github.com/chhongzh/chz_Base_Backend/internal/service/action"
+	"github.com/chhongzh/chz_Base_Backend/pkg/shortcuts"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -19,16 +19,16 @@ func (h *Handler) userRegister(c *gin.Context) {
 	// 检查是否到达上限
 	currentUserCount, err := h.userService.Count()
 	if err != nil {
-		response.BuildResponseWithError(c, err)
+		shortcuts.BuildResponseWithError(c, err)
 		return
 	}
 	if currentUserCount >= h.maxUserCount {
 		// Action 记录
-		h.actionService.Commit("ROOT", "[用户] 用户数量达到上限", action.NewMetaChain().
+		h.actionService.Commit("ROOT", "[用户] 用户数量达到上限", shortcuts.NewMetaChain().
 			WithClientInfo(c),
 		)
 
-		response.BuildResponseWithError(c, problem.ErrUserMaxCountLimit)
+		shortcuts.BuildResponseWithError(c, problem.ErrUserMaxCountLimit)
 		return
 	}
 
@@ -40,12 +40,12 @@ func (h *Handler) userRegister(c *gin.Context) {
 			zap.Error(err),
 		)
 
-		response.BuildResponseWithError(c, err)
+		shortcuts.BuildResponseWithError(c, err)
 		return
 	}
 
 	// Action 记录
-	h.actionService.Commit("ROOT", "[用户] 注册", action.NewMetaChain().
+	h.actionService.Commit("ROOT", "[用户] 注册", shortcuts.NewMetaChain().
 		Add("User ID", user.UserID).
 		WithClientInfo(c),
 	)
@@ -60,35 +60,35 @@ func (h *Handler) userLogin(c *gin.Context) {
 
 	user, err := h.userService.FromUsername(req.Username)
 	if err != nil {
-		response.BuildResponseWithError(c, problem.ErrLoginFailed)
+		shortcuts.BuildResponseWithError(c, problem.ErrLoginFailed)
 		return
 	}
 
 	if user.Password != req.Password {
-		response.BuildResponseWithError(c, problem.ErrLoginFailed)
+		shortcuts.BuildResponseWithError(c, problem.ErrLoginFailed)
 		return
 	}
 
 	// 检查是否被封禁
 	if user.Banned {
-		response.BuildResponseWithError(c, problem.ErrUserHasBeenBanned)
+		shortcuts.BuildResponseWithError(c, problem.ErrUserHasBeenBanned)
 		return
 	}
 
 	// 签发 Auth Token
 	authToken, err := h.securityService.UserIDToAuthToken(user.UserID)
 	if err != nil {
-		response.BuildResponseWithError(c, err)
+		shortcuts.BuildResponseWithError(c, err)
 		return
 	}
 
 	// Action 记录
-	h.actionService.Commit("ROOT", "[用户] 登录", action.NewMetaChain().
+	h.actionService.Commit("ROOT", "[用户] 登录", shortcuts.NewMetaChain().
 		Add("User ID", user.UserID).
 		WithClientInfo(c),
 	)
 
-	response.BuildResponse(c, response.UserLogin{
+	shortcuts.BuildResponse(c, response.UserLogin{
 		AuthToken: authToken,
 	})
 }

@@ -1,4 +1,4 @@
-package action
+package shortcuts
 
 import "github.com/gin-gonic/gin"
 

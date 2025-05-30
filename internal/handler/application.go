@@ -4,7 +4,7 @@ import (
 	"github.com/chhongzh/chz_Base_Backend/internal/problem"
 	"github.com/chhongzh/chz_Base_Backend/internal/request"
 	"github.com/chhongzh/chz_Base_Backend/internal/response"
-	"github.com/chhongzh/chz_Base_Backend/internal/service/action"
+	"github.com/chhongzh/chz_Base_Backend/pkg/shortcuts"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,24 +18,24 @@ func (h *Handler) applicationDelete(c *gin.Context) {
 	// 加载用户
 	user, err := h.userFromAuthToken(req.AuthToken)
 	if err != nil {
-		response.BuildResponseWithError(c, err)
+		shortcuts.BuildResponseWithError(c, err)
 		return
 	}
 
 	// 判断是否Application权限
 	if !h.permissionService.HasPermission(user.UserID, "ROOT", "application") {
-		response.BuildResponseWithError(c, problem.ErrNoPermission)
+		shortcuts.BuildResponseWithError(c, problem.ErrNoPermission)
 	}
 
 	// 删除应用
 	err = h.applicationService.DeleteApplication(req.ApplicationID)
 	if err != nil {
-		response.BuildResponseWithError(c, err)
+		shortcuts.BuildResponseWithError(c, err)
 		return
 	}
 
 	// Action 记录
-	h.actionService.Commit("ROOT", "[应用] 删除", action.NewMetaChain().
+	h.actionService.Commit("ROOT", "[应用] 删除", shortcuts.NewMetaChain().
 		Add("User ID", user.UserID).
 		Add("Application ID", req.ApplicationID).
 		WithClientInfo(c),
@@ -52,24 +52,24 @@ func (h *Handler) applicationCreate(c *gin.Context) {
 	// 加载 User
 	user, err := h.userFromAuthToken(req.AuthToken)
 	if err != nil {
-		response.BuildResponseWithError(c, err)
+		shortcuts.BuildResponseWithError(c, err)
 		return
 	}
 
 	// 判断是否Application权限
 	if !h.permissionService.HasPermission(user.UserID, "ROOT", "application") {
-		response.BuildResponseWithError(c, problem.ErrNoPermission)
+		shortcuts.BuildResponseWithError(c, problem.ErrNoPermission)
 	}
 
 	// 创建应用
 	application, err := h.applicationService.CreateApplication(req.Name, req.Desc)
 	if err != nil {
-		response.BuildResponseWithError(c, err)
+		shortcuts.BuildResponseWithError(c, err)
 		return
 	}
 
 	// Action 记录
-	h.actionService.Commit("ROOT", "[应用] 创建", action.NewMetaChain().
+	h.actionService.Commit("ROOT", "[应用] 创建", shortcuts.NewMetaChain().
 		Add("User ID", user.UserID).
 		Add("Application ID", application.ApplicationID).
 		WithClientInfo(c),
@@ -86,19 +86,19 @@ func (h *Handler) applicationList(c *gin.Context) {
 	// 加载用户
 	user, err := h.userFromAuthToken(req.AuthToken)
 	if err != nil {
-		response.BuildResponseWithError(c, err)
+		shortcuts.BuildResponseWithError(c, err)
 		return
 	}
 
 	// 判断是否Application权限
 	if !h.permissionService.HasPermission(user.UserID, "ROOT", "application") {
-		response.BuildResponseWithError(c, problem.ErrNoPermission)
+		shortcuts.BuildResponseWithError(c, problem.ErrNoPermission)
 	}
 
 	// 获取应用列表
 	applications, err := h.applicationService.ListApplication(req.Page)
 	if err != nil {
-		response.BuildResponseWithError(c, err)
+		shortcuts.BuildResponseWithError(c, err)
 		return
 	}
 
@@ -111,5 +111,22 @@ func (h *Handler) applicationList(c *gin.Context) {
 		})
 	}
 
-	response.BuildResponse(c, applicationList)
+	shortcuts.BuildResponse(c, applicationList)
+}
+
+// 获取公开信息
+func (h *Handler) applicationPublicInfo(c *gin.Context) {
+	applicationID := c.Param("ApplicationID")
+
+	// 获取 Application
+	application, err := h.applicationService.GetApplicationByApplicationID(applicationID)
+	if err != nil {
+		shortcuts.BuildResponseWithError(c, err)
+		return
+	}
+
+	shortcuts.BuildResponse(c, response.ApplicationPublicInfo{
+		Name: application.Name,
+		Desc: application.Desc,
+	})
 }

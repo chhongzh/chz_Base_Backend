@@ -8,9 +8,10 @@ import (
 type Application struct {
 	gorm.Model
 
-	Name          string
-	Desc          string
-	ApplicationID string
+	Name              string
+	Desc              string
+	ApplicationSecret string
+	ApplicationID     string
 }
 
 func (a *Application) BeforeCreate(tx *gorm.DB) error {
@@ -18,5 +19,7 @@ func (a *Application) BeforeCreate(tx *gorm.DB) error {
 	if a.ApplicationID == "" {
 		a.ApplicationID = uuid.NewString()
 	}
+	a.ApplicationSecret = uuid.NewString()
+
 	return nil
 }
