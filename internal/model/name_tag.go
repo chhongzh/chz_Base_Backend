@@ -1,69 +1,69 @@
 package model
 
 import (
-    "github.com/chhongzh/chz_Base_Backend/internal/problem"
-    "github.com/google/uuid"
-    "gorm.io/gorm"
+	"github.com/chhongzh/chz_Base_Backend/internal/problem"
+	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type NameTag struct {
-    gorm.Model
+	gorm.Model
 
-    nameTagID string
+	NameTagID string
 
-    tag   string `validate:"min=1,max=32"`
-    color string `validate:"hexcolor"`
+	Tag   string `validate:"min=1,max=32"`
+	Color string `validate:"hexcolor"`
 }
 
-type NameTagRelation struct {
-    gorm.Model
+type NameTagOwned struct {
+	gorm.Model
 
-    nameTagRelationID string
-    nameTagID         string
-    forUserID         string
+	NameTagRelationID string
+	NameTagID         string
+	ForUserID         string
 }
 
 func (n *NameTag) BeforeCreate(tx *gorm.DB) error {
-    n.nameTagID = uuid.NewString()
-    return nil
+	n.NameTagID = uuid.NewString()
+	return nil
 }
 
-func (n *NameTagRelation) BeforeCreate(tx *gorm.DB) error {
-    var count int64
+func (n *NameTagOwned) BeforeCreate(tx *gorm.DB) error {
+	var count int64
 
-    // 1. 检查 NameTag 是否存在
-    tx.Model(&NameTag{}).
-        Where("name_tag_id = ?", n.nameTagID).
-        Count(&count)
-    if count == 0 {
-        return problem.ErrNameTagNotFound
-    }
+	// 1. 检查 NameTag 是否存在
+	tx.Model(&NameTag{}).
+		Where("name_tag_id = ?", n.NameTagID).
+		Count(&count)
+	if count == 0 {
+		return problem.ErrNameTagNotFound
+	}
 
-    // 2. 检查 User 是否存在
-    tx.Model(&User{}).
-        Where("user_id = ?", n.forUserID).
-        Count(&count)
-    if count == 0 {
-        return problem.ErrUserNotFound
-    }
+	// 2. 检查 User 是否存在
+	tx.Model(&User{}).
+		Where("user_id = ?", n.ForUserID).
+		Count(&count)
+	if count == 0 {
+		return problem.ErrUserNotFound
+	}
 
-    // 3. 检查是否重复
-    tx.Model(&NameTagRelation{}).
-        Where("name_tag_id = ?", n.nameTagID).
-        Where("for_user_id = ?", n.forUserID).
-        Count(&count)
-    if count > 0 {
-        return problem.ErrNameTagRelationAlreadyExists
-    }
+	// 3. 检查是否重复
+	tx.Model(&NameTagOwned{}).
+		Where("name_tag_id = ?", n.NameTagID).
+		Where("for_user_id = ?", n.ForUserID).
+		Count(&count)
+	if count > 0 {
+		return problem.ErrNameTagRelationAlreadyExists
+	}
 
-    return nil
+	return nil
 }
 
 func (n *NameTag) BeforeSave(tx *gorm.DB) error {
-    // 检查 NameTag 的颜色
-    err := validator.Struct(n)
-    if err != nil {
-        return err
-    }
-    return nil
+	// 检查 NameTag 的颜色
+	err := validator.Struct(n)
+	if err != nil {
+		return err
+	}
+	return nil
 }
