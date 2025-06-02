@@ -44,9 +44,6 @@ func ProxyConn(oldConn net.Conn, logger *zap.Logger) *ConnProxy {
 
 func (c *ConnProxy) Read(b []byte) (n int, err error) {
 	n, err = c.proxyTo.Read(b)
-	if err != nil {
-		c.logger.Error("Read failed", zap.Error(err))
-	}
 
 	// 增加计数器
 	c.totalReadByteCount += uint64(n)
@@ -67,11 +64,7 @@ func (c *ConnProxy) Write(b []byte) (n int, err error) {
 }
 
 func (c *ConnProxy) Close() error {
-	err := c.proxyTo.Close()
-	if err != nil {
-		c.logger.Error("Close failed", zap.Error(err))
-	}
-	return err
+	return c.proxyTo.Close()
 }
 
 func (c *ConnProxy) RemoteAddr() net.Addr {
