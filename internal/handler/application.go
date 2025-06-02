@@ -25,6 +25,7 @@ func (h *Handler) applicationDelete(c *gin.Context) {
 	// 判断是否Application权限
 	if !h.permissionService.HasPermission(user.UserID, "ROOT", "application") {
 		shortcuts.BuildResponseWithError(c, problem.ErrNoPermission)
+		return
 	}
 
 	// 删除应用
@@ -46,6 +47,7 @@ func (h *Handler) applicationCreate(c *gin.Context) {
 	var req request.ApplicationCreate
 	err := c.BindJSON(&req)
 	if err != nil {
+		shortcuts.BuildResponseWithError(c, err)
 		return
 	}
 
@@ -59,6 +61,7 @@ func (h *Handler) applicationCreate(c *gin.Context) {
 	// 判断是否Application权限
 	if !h.permissionService.HasPermission(user.UserID, "ROOT", "application") {
 		shortcuts.BuildResponseWithError(c, problem.ErrNoPermission)
+		return
 	}
 
 	// 创建应用
@@ -93,6 +96,7 @@ func (h *Handler) applicationList(c *gin.Context) {
 	// 判断是否Application权限
 	if !h.permissionService.HasPermission(user.UserID, "ROOT", "application") {
 		shortcuts.BuildResponseWithError(c, problem.ErrNoPermission)
+		return
 	}
 
 	// 获取应用列表
